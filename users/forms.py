@@ -1,5 +1,5 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
+from django.contrib.auth.forms import AuthenticationForm, UserCreationForm, UserChangeForm
 from .models import User  # Важно: импортируем вашу кастомную модель!
 
 class LoginForm(AuthenticationForm):
@@ -45,3 +45,21 @@ class RegisterForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+class EditProfileForm(UserChangeForm):
+    """
+    Форма для редактирования профиля пользователя.
+    Наследуется от UserChangeForm и позволяет изменять email, first_name и last_name.
+    """
+    password = None  # Убираем поле password из формы
+
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name', 'email')
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Убираем help_text для полей (необязательно)
+        self.fields['first_name'].help_text = None
+        self.fields['last_name'].help_text = None
+        self.fields['email'].help_text = None

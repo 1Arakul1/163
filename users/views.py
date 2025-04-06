@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect
+from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout as django_logout
 from django.contrib.auth.decorators import login_required
-from .forms import LoginForm, RegisterForm
+from django.contrib.auth import update_session_auth_hash  # Импорт функции для обновления сессии
+from .forms import LoginForm, RegisterForm, EditProfileForm
 from dogs.models import Dog
-from django.contrib import messages
+
 
 @login_required
 def user_profile(request):
@@ -22,20 +24,33 @@ def user_profile(request):
     }
     return render(request, 'users/user_profile.html', context)
 
+
 @login_required
-def account_info(request):
+def edit_profile(request):
     """
-    Представление для отображения информации об аккаунте.
+    Представление для редактирования профиля пользователя.
     """
-    title = "Информация об аккаунте"
-    user = request.user  # Получаем текущего пользователя
+    title = 'Редактировать профиль'
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Профиль успешно обновлен!')
+            return redirect('users:user_profile')  # Перенаправляем на страницу профиля
+        else:
+            messages.error(request, 'Пожалуйста, исправьте ошибки в форме.')
+    else:
+        form = EditProfileForm(instance=request.user)
     context = {
         'title': title,
-        'user': user,
+        'form': form,
     }
-    return render(request, 'users/account_info.html', context)
+    return render(request, 'users/edit_profile.html', context)
 
 def user_login(request):
+    """
+    Представление для входа пользователя.
+    """
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
         if form.is_valid():
@@ -54,11 +69,14 @@ def user_login(request):
         form = LoginForm(request)
     return render(request, 'users/login.html', {'form': form})
 
+
 def register(request):
+    """
+    Представление для регистрации нового пользователя.
+    """
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            print("Форма прошла валидацию!")
             try:
                 user = form.save()
                 login(request, user)
@@ -67,13 +85,17 @@ def register(request):
                 messages.error(request, f"Ошибка при регистрации: {e}")
                 return render(request, 'users/register.html', {'form': form})
         else:
-            print("Форма НЕ прошла валидацию!")
-            print(form.errors)
-            return render(request, 'users/register.html', {'form': form, 'error': 'Неверные данные'})
+            messages.error(request, 'Пожалуйста, исправьте ошибки ниже.')
+            return render(request, 'users/register.html', {'form': form})
     else:
         form = RegisterForm()
     return render(request, 'users/register.html', {'form': form})
 
+
+@login_required
 def logout(request):
+    """
+    Представление для выхода пользователя.
+    """
     django_logout(request)
     return redirect('dogs:index')

@@ -26,6 +26,7 @@
             <p class="card-text"><strong>Имя:</strong> {{ user.first_name }}</p>
             <p class="card-text"><strong>Фамилия:</strong> {{ user.last_name }}</p>
             <p class="card-text"><strong>Дата регистрации:</strong> {{ user.date_joined }}</p>
+            <a href="{% url 'users:edit_profile' %}" class="btn btn-primary">Редактировать профиль</a> <!-- Ссылка на редактирование профиля -->
           </div>
         </div>
       </div>
