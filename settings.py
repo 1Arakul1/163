@@ -24,14 +24,14 @@ ALLOWED_HOSTS = ['192.168.90.150', 'localhost', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
-    'dogs',
-    'users',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'dogs',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -49,7 +49,10 @@ ROOT_URLCONF = 'my_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [
+            BASE_DIR / 'templates',  # Если есть общие шаблоны
+            BASE_DIR / 'dogs' / 'templates' # Добавь этот путь!
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -58,6 +61,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
             ],
+            'debug': True,  # Add this line
         },
     },
 ]

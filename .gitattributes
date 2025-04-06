@@ -1,3 +1,5 @@
-# Установить конец строки для всех файлов в репозитории
-* text=auto
+*.txt text eol=lf
+*.py text eol=lf
+*.html text eol=lf
+* text=auto eol=lf
 
